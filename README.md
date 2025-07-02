@@ -1,1 +1,23 @@
-<pre><code># 🔐 Treasure Hunt: Crypto Puzzle Game Một ứng dụng web trò chơi giải mã nhiều cấp độ, xây dựng bằng Flask. Người chơi vượt qua các thử thách từ Caesar, Vigenère đến RSA và AES để tìm kho báu. --- ## 🚀 Giới thiệu - Web game có 4 cấp độ với cốt truyện và gợi ý. - Hỗ trợ các thuật toán mã hóa/giải mã: **Caesar**, **Vigenère**, **RSA**, **AES**. - Chế độ luyện tập không giới hạn để học mật mã. - Theo dõi lịch sử chơi. --- ## 🗺️ Cấu trúc repo ``` . ├── app.py # Flask server với toàn bộ route ├── main.py # Điểm khởi động server (entrypoint) ├── game_data.py # Dữ liệu game, sinh thông tin và câu đố ├── game_history.py # Quản lý và lưu lịch sử chơi └── crypto_algorithms.py # Các hàm mã hóa và giải mã ``` --- ## ⚙️ Cài đặt **Yêu cầu**: - Python >= 3.8 - pip **Cài thư viện**: ```bash pip install Flask pycryptodome ``` --- ## ▶️ Chạy server ```bash python main.py ``` Server Flask sẽ chạy trên: ``` http://0.0.0.0:5002/ ``` --- ## 🎮 Cách chơi - Trang chủ giới thiệu trò chơi. - 4 cấp độ chính: 1. **Caesar Cipher** 2. **Vigenère Cipher** 3. **RSA Encryption** 4. **AES Encryption** - Mỗi cấp độ: - Có câu đố đã mã hóa. - Người chơi nhập “khóa” phù hợp để giải mã. - Hệ thống chấm điểm theo tốc độ và số lần thử. - Chế độ **Practice**: - Chọn bất kỳ thuật toán nào. - Luyện giải mã với đề tự sinh. --- ## 🗃️ Tính năng chính ✅ Mã hóa/Giải mã với 4 thuật toán: - **Caesar Cipher** – dịch chữ cái theo shift - **Vigenère Cipher** – dùng từ khóa - **RSA** – khóa công khai/riêng tư - **AES** – mã hóa đối xứng với key ✅ Theo dõi **history**: - Lưu thành tích, thời gian, điểm số ✅ Chế độ **Practice**: - Tự động sinh bài tập với gợi ý ✅ Web UI dễ tùy biến --- ## 📂 Lưu ý cấu hình - Secret key cho Flask: - Được đặt trong biến môi trường `SESSION_SECRET` - Hoặc mặc định là `"treasure_hunt_secret_key_2024"` - Lịch sử game mặc định lưu ở `game_history.json` trong thư mục hiện tại. --- ## 💻 Dev Notes - Flask routes trong `app.py`: - `/` – Trang chủ - `/level/<int:level_num>` – Cấp độ cụ thể - `/decrypt` – Xử lý form giải mã - `/hint/<int:level_num>` – Gợi ý - `/history` – Xem lịch sử - `/practice` – Chọn mode luyện tập - `/practice/<algorithm>` – Bài tập thuật toán - ... - Các thuật toán nằm trong `crypto_algorithms.py`: - Caesar, Vigenère, RSA (tự sinh key nhỏ), AES-CBC --- ## 📜 License MIT – thoải mái sử dụng và tùy biến. --- ## ❤️ Tác giả - @lv.viet.vn </code></pre>
+# Treasure Hunt Decryption Game
+
+A Flask-based web game where players decrypt messages using various cryptographic algorithms (Caesar, Vigenère, RSA, AES) to progress through levels and uncover a treasure.
+
+## Setup
+1. Install dependencies: `pip install flask pycryptodome`
+2. Run the application: `python main.py`
+3. Access the game at `http://localhost:5002`
+
+## Features
+- Four levels with increasing difficulty
+- Practice mode for learning cryptographic algorithms
+- Game history tracking
+- Hint system and algorithm explanations
+
+## Files
+- `app.py`: Main Flask application
+- `game_data.py`: Level and practice data
+- `crypto_algorithms.py`: Cryptographic implementations
+- `game_history.py`: History management
+- `main.py`: Application entry point
+- `templates/`: HTML templates
+- `static/`: CSS and JavaScript files
