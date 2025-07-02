@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Chế độ Luyện tập</h1>
+    <p class="text-center mb-4">Chọn một thuật toán để luyện tập:</p>
+    
+    <div class="row justify-content-center">
+        {% for algorithm in algorithms %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        {% if algorithm == 'caesar' %}
+                            Mật mã Caesar
+                        {% elif algorithm == 'vigenere' %}
+                            Mật mã Vigenère
+                        {% elif algorithm == 'rsa' %}
+                            Mật mã RSA
+                        {% elif algorithm == 'aes' %}
+                            Mật mã AES
+                        {% endif %}
+                    </h5>
+                    <p class="card-text">
+                        {% if algorithm == 'caesar' %}
+                            Luyện tập với mật mã dịch chuyển đơn giản
+                        {% elif algorithm == 'vigenere' %}
+                            Luyện tập với mật mã đa bảng
+                        {% elif algorithm == 'rsa' %}
+                            Luyện tập với mật mã khóa công khai
+                        {% elif algorithm == 'aes' %}
+                            Luyện tập với chuẩn mã hóa hiện đại
+                        {% endif %}
+                    </p>
+                    <a href="{{ url_for('practice_algorithm', algorithm=algorithm) }}" class="btn btn-primary">Bắt đầu luyện tập</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Quay lại trang chủ</a>
+    </div>
+</div>
+{% endblock %} 

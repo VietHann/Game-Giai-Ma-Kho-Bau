@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}{{ level_data.title }} - Trò Chơi Giải Mã Kho Báu{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="level-progress">
+                <h6><i class="fas fa-map-marked-alt me-2"></i>Tiến độ cuộc phiêu lưu</h6>
+                <div class="progress mb-2">
+                    <div class="progress-bar" role="progressbar" style="width: {{ (level_num / 4) * 100 }}%">
+                        {{ level_num }}/4
+                    </div>
+                </div>
+                <div class="level-indicators">
+                    {% for i in range(1, 5) %}
+                        <span class="level-indicator {{ 'completed' if i in game_state.completed_levels else 'current' if i == level_num else 'locked' }}">
+                            <i class="fas fa-{{ 'check-circle' if i in game_state.completed_levels else 'play-circle' if i == level_num else 'lock' }}"></i>
+                            Cấp {{ i }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Game Area -->
+        <div class="col-lg-8">
+            <div class="game-card">
+                <div class="card-header">
+                    <h3 class="pirata-font">{{ level_data.title }}</h3>
+                    <div class="level-stats">
+                        <span class="badge bg-info">
+                            <i class="fas fa-star me-1"></i>{{ game_state.score }} điểm
+                        </span>
+                        <span class="badge bg-warning">
+                            <i class="fas fa-eye me-1"></i>{{ game_state.hints_used }} gợi ý
+                        </span>
+                        <span class="badge bg-secondary">
+                            <i class="fas fa-redo me-1"></i>{{ game_state.attempts }} lần thử
+                        </span>
+                    </div>
+                </div>
+                <br>
+                <div class="card-body">
+                    <!-- Story Section -->
+                    <div class="story-section mb-4">
+                        <h5><i class="fas fa-book-open me-2"></i>Câu Chuyện</h5>
+                        <p class="story-text">{{ level_data.story }}</p>
+                    </div>
+                    
+                    <!-- Encrypted Message -->
+                    <div class="encrypted-message-section mb-4">
+                        <h5><i class="fas fa-scroll me-2"></i>Thông Điệp Bí Ẩn</h5>
+                        <div class="encrypted-message">
+                            <code>{{ level_data.encrypted_message }}</code>
+                        </div>
+                    </div>
+                    
+                    <!-- Decryption Form -->
+                    <div class="decryption-section mb-4">
+                        <h5><i class="fas fa-unlock me-2"></i>Giải Mã</h5>
+                        <form method="POST" action="{{ url_for('decrypt') }}" class="decryption-form">
+                            <input type="hidden" name="level" value="{{ level_num }}">
+                            <input type="hidden" name="algorithm" value="{{ level_data.algorithm }}">
+                            
+                            <div class="mb-3">
+                                <label for="input" class="form-label">{{ level_data.instruction }}</label>
+                                {% if level_data.algorithm == 'caesar' %}
+                                    <input type="number" class="form-control" id="input" name="input" min="0" max="25" required>
+                                {% elif level_data.algorithm == 'rsa' %}
+                                    <input type="text" class="form-control" id="input" name="input" placeholder="(n, d)" required>
+                                {% else %}
+                                    <input type="text" class="form-control" id="input" name="input" required>
+                                {% endif %}
+                                <div class="form-text">
+                                    {% if level_data.algorithm == 'caesar' %}
+                                        Nhập số từ 0 đến 25 để thử dịch chuyển khác nhau
+                                    {% elif level_data.algorithm == 'vigenere' %}
+                                        Nhập từ khóa chỉ gồm chữ cái (không có số hoặc ký tự đặc biệt)
+                                    {% elif level_data.algorithm == 'rsa' %}
+                                        Nhập khóa riêng tư dưới dạng (n, d), ví dụ: (143, 7)
+                                    {% elif level_data.algorithm == 'aes' %}
+                                        Nhập khóa bí mật để giải mã AES
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key me-2"></i>Giải Mã
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="getHint({{ level_num }})">
+                                    <i class="fas fa-lightbulb me-2"></i>Gợi Ý
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="showAlgorithmInfo('{{ level_data.algorithm }}')">
+                                    <i class="fas fa-info-circle me-2"></i>Giải Thích Thuật Toán
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Algorithm Info -->
+            <div class="info-card mb-3" style="border: 1px solid #ccc; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background-color: #0d6efd; color: white; padding: 10px;">
+                    <h5 style="margin: 0;"><i class="fas fa-cogs me-2"></i>{{ level_data.algorithm_name }}</h5>
+                </div>
+                <div class="card-body" style="padding: 10px;">
+                    <div id="algorithm-explanation">
+                        <p style="margin: 0;">Nhấn "Giải Thích Thuật Toán" để xem thông tin chi tiết về thuật toán này.</p>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Hints -->
+            <div class="info-card mb-3" style="border: 1px solid #ccc; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background-color: #198754; color: white; padding: 10px;">
+                    <h5 style="margin: 0;"><i class="fas fa-lightbulb me-2"></i>Gợi Ý</h5>
+                </div>
+                <div class="card-body" style="padding: 10px;">
+                    <div id="hint-content">
+                        <p class="text-muted" style="margin: 0;">Nhấn "Gợi Ý" khi cần trợ giúp!</p>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Navigation -->
+            <div class="info-card" style="border: 1px solid #ccc; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background-color: #0d6efd; color: white; padding: 10px;">
+                    <h5 style="margin: 0;"><i class="fas fa-compass me-2"></i>Điều Hướng</h5>
+                </div>
+                <div class="card-body" style="padding: 10px;">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home me-2"></i>Trang Chủ
+                        </a>
+                        {% if level_num > 1 and (level_num - 1) in game_state.completed_levels %}
+                        <a href="{{ url_for('level', level_num=level_num-1) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Cấp Trước
+                        </a>
+                        {% endif %}
+                        {% if (level_num + 1) <= 4 and level_num in game_state.completed_levels %}
+                        <a href="{{ url_for('level', level_num=level_num+1) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-right me-2"></i>Cấp Sau
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Algorithm Info Modal -->
+<div class="modal fade" id="algorithmModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-graduation-cap me-2"></i>Giải Thích Thuật Toán
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-algorithm-content">
+                <!-- Content will be loaded by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function getHint(levelNum) {
+    fetch(`/hint/${levelNum}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('hint-content').innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    ${data.hint}
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('hint-content').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Không thể tải gợi ý. Vui lòng thử lại!
+                </div>
+            `;
+        });
+}
+
+function showAlgorithmInfo(algorithm) {
+    fetch(`/explain/${algorithm}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('modal-algorithm-content').innerHTML = data.explanation;
+            document.getElementById('algorithm-explanation').innerHTML = data.explanation;
+            const modal = new bootstrap.Modal(document.getElementById('algorithmModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('modal-algorithm-content').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Không thể tải thông tin thuật toán. Vui lòng thử lại!
+                </div>
+            `;
+        });
+}
+</script>
+{% endblock %}

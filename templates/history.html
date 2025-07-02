@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Lịch sử giải mã</h2>
+    
+    {% if history %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Cấp độ</th>
+                    <th>Thời gian giải</th>
+                    <th>Số lần thử</th>
+                    <th>Điểm</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in history|reverse %}
+                <tr>
+                    <td>{{ record.timestamp }}</td>
+                    <td>Cấp độ {{ record.level }}</td>
+                    <td>{{ record.time_taken }}</td>
+                    <td>{{ record.attempts }}</td>
+                    <td>{{ record.score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <a href="{{ url_for('clear_history') }}" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa lịch sử?')">
+        Xóa lịch sử
+    </a>
+    {% else %}
+    <div class="alert alert-info">
+        Chưa có lịch sử giải mã nào.
+    </div>
+    {% endif %}
+    
+    <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">
+        Quay lại trang chủ
+    </a>
+</div>
+{% endblock %} 

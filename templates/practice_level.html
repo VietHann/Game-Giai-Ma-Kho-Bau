@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">
+        {% if algorithm == 'caesar' %}
+            Luyện tập Mật mã Caesar
+        {% elif algorithm == 'vigenere' %}
+            Luyện tập Mật mã Vigenère
+        {% elif algorithm == 'rsa' %}
+            Luyện tập Mật mã RSA
+        {% elif algorithm == 'aes' %}
+            Luyện tập Mật mã AES
+        {% endif %}
+    </h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Bản mã cần giải:</h5>
+                    <p class="card-text font-monospace">{{ practice_data.encrypted_message }}</p>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Gợi ý:</strong> {{ practice_data.hint }}
+                    </div>
+
+                    <form id="decryptForm" class="mt-4">
+                        <input type="hidden" name="algorithm" value="{{ algorithm }}">
+                        <input type="hidden" name="encrypted_message" value="{{ practice_data.encrypted_message }}">
+                        
+                        <div class="mb-3">
+                            <label for="input" class="form-label">
+                                {% if algorithm == 'caesar' %}
+                                    Nhập số bước dịch chuyển (0-25):
+                                {% elif algorithm == 'vigenere' %}
+                                    Nhập từ khóa (chỉ chữ cái):
+                                {% elif algorithm == 'rsa' %}
+                                    Nhập khóa riêng tư dưới dạng (n, d):
+                                {% elif algorithm == 'aes' %}
+                                    Nhập khóa bí mật:
+                                {% endif %}
+                            </label>
+                            <input type="text" class="form-control" id="input" name="input" required>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Giải mã</button>
+                            <button type="button" class="btn btn-secondary" onclick="generateNew()">Tạo bài mới</button>
+                        </div>
+                    </form>
+
+                    <div id="result" class="mt-4" style="display: none;">
+                        <h5>Kết quả:</h5>
+                        <p id="resultText" class="font-monospace"></p>
+                        <div id="correctMessage" class="alert alert-success" style="display: none;">
+                            Chính xác! Bạn đã giải mã thành công.
+                        </div>
+                        <div id="wrongMessage" class="alert alert-danger" style="display: none;">
+                            <p>Chưa chính xác. Hãy thử lại!</p>
+                            <p>Thông điệp gốc: <span id="originalMessage" class="font-monospace"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('practice_mode') }}" class="btn btn-secondary">Quay lại chọn thuật toán</a>
+    </div>
+</div>
+
+<script>
+document.getElementById('decryptForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const response = await fetch('/practice/decrypt', {
+        method: 'POST',
+        body: formData
+    });
+    
+    const data = await response.json();
+    const resultDiv = document.getElementById('result');
+    const resultText = document.getElementById('resultText');
+    const correctMessage = document.getElementById('correctMessage');
+    const wrongMessage = document.getElementById('wrongMessage');
+    const originalMessage = document.getElementById('originalMessage');
+    
+    resultDiv.style.display = 'block';
+    resultText.textContent = data.result;
+    
+    if (data.success) {
+        correctMessage.style.display = 'block';
+        wrongMessage.style.display = 'none';
+    } else {
+        correctMessage.style.display = 'none';
+        wrongMessage.style.display = 'block';
+        if (data.original) {
+            originalMessage.textContent = data.original;
+        }
+    }
+});
+
+function generateNew() {
+    window.location.reload();
+}
+</script>
+{% endblock %} 

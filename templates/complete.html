@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Hoàn Thành - Trò Chơi Giải Mã Kho Báu{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="completion-card text-center">
+                <div class="card-body p-5">
+                    <!-- Celebration Animation -->
+                    <div class="celebration-animation mb-4">
+                        <i class="fas fa-trophy celebration-trophy"></i>
+                        <div class="confetti">
+                            <div class="confetti-piece"></div>
+                            <div class="confetti-piece"></div>
+                            <div class="confetti-piece"></div>
+                            <div class="confetti-piece"></div>
+                            <div class="confetti-piece"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Congratulations -->
+                    <h1 class="pirata-font text-primary mb-3">
+                        🎉 Congratulations! 🎉
+                    </h1>
+                    <h2 class="mb-4">Bạn Đã Tìm Thấy Kho Báu!</h2>
+                    
+                    <!-- Success Message -->
+                    <div class="success-message mb-4">
+                        <p class="lead">
+                            Xuất sắc! Bạn đã hoàn thành tất cả 4 cấp độ và thành thạo 
+                            các thuật toán mã hóa cơ bản. Kho báu cuối cùng đã thuộc về bạn!
+                        </p>
+                    </div>
+                    
+                    <!-- Final Score -->
+                    <div class="final-score mb-4">
+                        <div class="score-circle">
+                            <div class="score-number">{{ game_state.score }}</div>
+                            <div class="score-label">Điểm Cuối</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievement Stats -->
+                    <div class="achievement-stats mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <h5>{{ game_state.completed_levels|length }}/4</h5>
+                                    <p>Cấp độ hoàn thành</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <i class="fas fa-redo text-info"></i>
+                                    <h5>{{ game_state.attempts }}</h5>
+                                    <p>Lần thử</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <i class="fas fa-lightbulb text-warning"></i>
+                                    <h5>{{ game_state.hints_used }}</h5>
+                                    <p>Gợi ý sử dụng</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <i class="fas fa-shield-alt text-primary"></i>
+                                    <h5>4</h5>
+                                    <p>Thuật toán đã học</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievement Badges -->
+                    <div class="achievement-badges mb-4">
+                        <h5>Thành Tích Đạt Được:</h5>
+                        <div class="badges-row">
+                            <span class="achievement-badge">
+                                <i class="fas fa-graduation-cap"></i>
+                                Nhà Vua Của Trò Chơi
+                            </span>
+                            <span class="achievement-badge">
+                                <i class="fas fa-key"></i>
+                                Chuyên Gia Giải Mã
+                            </span>
+                            <span class="achievement-badge">
+                                <i class="fas fa-treasure-chest"></i>
+                                Thợ Săn Kho Báu
+                            </span>
+                            {% if game_state.hints_used == 0 %}
+                            <span class="achievement-badge special">
+                                <i class="fas fa-brain"></i>
+                                Thiên Tài Tự Học
+                            </span>
+                            {% endif %}
+                            {% if game_state.score >= 600 %}
+                            <span class="achievement-badge special">
+                                <i class="fas fa-star"></i>
+                                Điểm Số Hoàn Hảo
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Learning Summary -->
+                    <div class="learning-summary mb-4">
+                        <h5>Bạn Đã Học Được:</h5>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="learned-item">
+                                    <i class="fas fa-font text-primary"></i>
+                                    <strong>Caesar Cipher:</strong> Mã hóa dịch chuyển cơ bản
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="learned-item">
+                                    <i class="fas fa-key text-success"></i>
+                                    <strong>Vigenère Cipher:</strong> Mã hóa với từ khóa
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="learned-item">
+                                    <i class="fas fa-lock text-warning"></i>
+                                    <strong>RSA:</strong> Mã hóa khóa công khai
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="learned-item">
+                                    <i class="fas fa-shield-alt text-danger"></i>
+                                    <strong>AES:</strong> Chuẩn mã hóa hiện đại
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="{{ url_for('reset_game') }}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-redo me-2"></i>Chơi Lại
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>Trang Chủ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fireworks Effect -->
+<div class="fireworks">
+    <div class="firework"></div>
+    <div class="firework"></div>
+    <div class="firework"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add some celebration effects
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate trophy
+    const trophy = document.querySelector('.celebration-trophy');
+    if (trophy) {
+        trophy.style.animation = 'bounce 2s infinite';
+    }
+    
+    // Add sparkle effect
+    setTimeout(() => {
+        createSparkles();
+    }, 1000);
+});
+
+function createSparkles() {
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            sparkle.innerHTML = '✨';
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                if (sparkle.parentNode) {
+                    sparkle.parentNode.removeChild(sparkle);
+                }
+            }, 3000);
+        }, i * 200);
+    }
+}
+</script>
+{% endblock %}
